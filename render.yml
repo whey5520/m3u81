@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: m3u8-extractor
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"

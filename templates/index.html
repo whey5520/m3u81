@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Video URL Extractor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🎥 Direct Video URL Extractor</h1>
+    <input type="text" id="urlInput" placeholder="Paste a video page URL..." />
+    <button onclick="extractLinks()">Extract</button>
+    <pre id="output">Output will appear here...</pre>
+  </div>
+
+  <script>
+    async function extractLinks() {
+      const url = document.getElementById('urlInput').value.trim();
+      const output = document.getElementById('output');
+      output.textContent = '⏳ Extracting...';
+
+      const res = await fetch('/extract', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({url})
+      });
+
+      const result = await res.json();
+      output.textContent = JSON.stringify(result, null, 2);
+    }
+  </script>
+</body>
+</html>
