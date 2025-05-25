@@ -2,15 +2,16 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>🎥 Video URL Extractor</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
     <h1>🎥 Direct Video URL Extractor</h1>
-    <input type="text" id="urlInput" placeholder="Paste a video page URL..." />
+    <input type="url" id="urlInput" placeholder="Paste a video page URL..." autocomplete="off" />
     <button id="extractBtn" onclick="extractLinks()">Extract</button>
-    <div id="output" class="output-box">Output will appear here...</div>
+    <div id="output" class="output-box" aria-live="polite" aria-atomic="true">Output will appear here...</div>
   </div>
 
   <script>
@@ -28,6 +29,7 @@
       const btn = document.createElement('button');
       btn.textContent = 'Copy';
       btn.className = 'copy-btn';
+      btn.setAttribute('aria-label', `Copy link ${linkUrl}`);
       btn.onclick = () => {
         navigator.clipboard.writeText(linkUrl).then(() => {
           btn.textContent = 'Copied!';
