@@ -1,32 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <title>Video URL Extractor</title>
+  <title>🎥 Video URL Extractor</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="container">
     <h1>🎥 Direct Video URL Extractor</h1>
     <input type="text" id="urlInput" placeholder="Paste a video page URL..." />
-    <button onclick="extractLinks()">Extract</button>
-    <pre id="output">Output will appear here...</pre>
+    <button id="extractBtn" onclick="extractLinks()">Extract</button>
+    <div id="output" class="output-box">Output will appear here...</div>
   </div>
 
   <script>
+    function createLink(url) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.textContent = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.className = 'output-link';
+      return a;
+    }
+
+    function createCopyBtn(linkUrl) {
+      const btn = document.createElement('button');
+      btn.textContent = 'Copy';
+      btn.className = 'copy-btn';
+      btn.onclick = () => {
+        navigator.clipboard.writeText(linkUrl).then(() => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => btn.textContent = 'Copy', 1500);
+        });
+      };
+      return btn;
+    }
+
     async function extractLinks() {
       const url = document.getElementById('urlInput').value.trim();
       const output = document.getElementById('output');
+      const btn = document.getElementById('extractBtn');
+
+      if (!url) {
+        output.textContent = '⚠️ Please enter a URL.';
+        return;
+      }
+
       output.textContent = '⏳ Extracting...';
+      btn.disabled = true;
 
-      const res = await fetch('/extract', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({url})
-      });
+      try {
+        const res = await fetch('/extract', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({url})
+        });
 
-      const result = await res.json();
-      output.textContent = JSON.stringify(result, null, 2);
+        const data = await res.json();
+
+        output.innerHTML = ''; // Clear output
+
+        if (data.error) {
+          output.textContent = '❌ Error: ' + data.error;
+        } else if (data.type === 'none') {
+          output.textContent = data.message;
+        } else {
+          const heading = document.createElement('p');
+          heading.textContent = `Found ${data.links.length} ${data.type.toUpperCase()} link(s):`;
+          heading.className = 'result-heading';
+          output.appendChild(heading);
+
+          data.links.forEach(link => {
+            const linkWrapper = document.createElement('div');
+            linkWrapper.className = 'link-wrapper';
+
+            const a = createLink(link);
+            const copyBtn = createCopyBtn(link);
+
+            linkWrapper.appendChild(a);
+            linkWrapper.appendChild(copyBtn);
+            output.appendChild(linkWrapper);
+          });
+        }
+      } catch (err) {
+        output.textContent = '❌ Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
     }
   </script>
 </body>
