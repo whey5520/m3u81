@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify
 import requests
 import re
+import os
 
 app = Flask(__name__)
 
@@ -19,8 +20,8 @@ def extract():
         res = requests.get(target_url, timeout=10)
         content = res.text
 
-        mp4_links = list(set(re.findall(r'https?://[^\\s"\'>]+\\.mp4[^"\'\\s>]*', content)))
-        m3u8_links = list(set(re.findall(r'https?://[^\\s"\'>]+\\.m3u8[^"\'\\s>]*', content)))
+        mp4_links = list(set(re.findall(r'https?://[^\s"\'<>]+\.mp4[^\s"\'<>]*', content)))
+        m3u8_links = list(set(re.findall(r'https?://[^\s"\'<>]+\.m3u8[^\s"\'<>]*', content)))
 
         return jsonify({
             'mp4': mp4_links,
@@ -31,4 +32,5 @@ def extract():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
