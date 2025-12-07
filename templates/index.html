@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,6 +7,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <!-- ======== 廣告位（置頂）======== -->
+  <div style="text-align: center; padding: 10px 0; background: #f8f8f8; border-bottom: 1px solid #ddd;">
+    <div id="webtraf_17728" style="display: inline-block; width:468px; height:60px;">
+      <script src="https://webtrafic.ru/ads.php?uid=17728" async></script>
+    </div>
+  </div>
+  <!-- ======== 廣告結束 ======== -->
+
   <div class="container">
     <h1>🎥 Direct Video URL Extractor</h1>
     <input type="url" id="urlInput" placeholder="Paste a video page URL..." autocomplete="off" />
@@ -24,7 +32,6 @@
       a.className = 'output-link';
       return a;
     }
-
     function createCopyBtn(linkUrl) {
       const btn = document.createElement('button');
       btn.textContent = 'Copy';
@@ -38,31 +45,24 @@
       };
       return btn;
     }
-
     async function extractLinks() {
       const url = document.getElementById('urlInput').value.trim();
       const output = document.getElementById('output');
       const btn = document.getElementById('extractBtn');
-
       if (!url) {
         output.textContent = '⚠️ Please enter a URL.';
         return;
       }
-
       output.textContent = '⏳ Extracting...';
       btn.disabled = true;
-
       try {
         const res = await fetch('/extract', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({url})
         });
-
         const data = await res.json();
-
         output.innerHTML = ''; // Clear output
-
         if (data.error) {
           output.textContent = '❌ Error: ' + data.error;
         } else if (data.type === 'none') {
@@ -72,14 +72,11 @@
           heading.textContent = `Found ${data.links.length} ${data.type.toUpperCase()} link(s):`;
           heading.className = 'result-heading';
           output.appendChild(heading);
-
           data.links.forEach(link => {
             const linkWrapper = document.createElement('div');
             linkWrapper.className = 'link-wrapper';
-
             const a = createLink(link);
             const copyBtn = createCopyBtn(link);
-
             linkWrapper.appendChild(a);
             linkWrapper.appendChild(copyBtn);
             output.appendChild(linkWrapper);
